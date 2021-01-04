@@ -2,6 +2,10 @@
 
 Asteroid Radar
 
+See "Built With" section at the botom of this page to obtain an API Key, then add the following line to local.properities file:
+
+apiKey = API Key (i.e. apiKey = 0123456789ABCDEF0123456789ABCDEF01234567)
+
 ## Getting Started
 
 Asteroid Radar is an app to view the asteroids detected by NASA that pass near Earth, you can view all the detected asteroids in a period of time, their data (Size, velocity, distance to Earth) and if they are potentially hazardous.
