@@ -4,7 +4,7 @@ Asteroid Radar
 
 See "Built With" section at the botom of this page to obtain an API Key, then add the following line to local.properities file:
 
-apiKey = Api Key (i.e. apiKey = 0123456789ABCDEF0123456789ABCDEF01234567)
+apiKey = API Key (i.e. apiKey = 0123456789ABCDEF0123456789ABCDEF01234567)
 
 ## Getting Started
 
