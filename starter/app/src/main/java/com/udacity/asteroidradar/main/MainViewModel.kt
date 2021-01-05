@@ -3,32 +3,40 @@ package com.udacity.asteroidradar.main
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.udacity.asteroidradar.BuildConfig
 import com.udacity.asteroidradar.NasaApi
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
+import com.udacity.asteroidradar.PictureOfDay
+import kotlinx.coroutines.launch
 
 class MainViewModel : ViewModel() {
 
-    private val _response = MutableLiveData<String>()
+    private val _apod = MutableLiveData<PictureOfDay>()
 
-    val response: LiveData<String>
-        get() = _response
+    val apod: LiveData<PictureOfDay>
+        get() = _apod
 
     init {
         getNasaApod()
     }
 
     private fun getNasaApod() {
-        NasaApi.retrofitService.getProperites(BuildConfig.API_KEY).enqueue(object : Callback<String> {
-            override fun onResponse(call: Call<String>, response: Response<String>) {
-                _response.value = response.body()
+        viewModelScope.launch {
+            try {
+                _apod.value = NasaApi.retrofitService.getApod(BuildConfig.API_KEY)
+            } catch (e: Exception) {
+                _apod.value = PictureOfDay("","Failure: ${e.message}","")
             }
-
-            override fun onFailure(call: Call<String>, t: Throwable) {
-                _response.value = "Failure: " + t.message
-            }
-        })
+        }
     }
+//        NasaApi.retrofitService.getApod(BuildConfig.API_KEY).enqueue(object : Callback<PictureOfDay> {
+//            override fun onResponse(call: Call<PictureOfDay>, response: Response<PictureOfDay>) {
+//                _response.value = "${response.body()?.title}"
+//            }
+//
+//            override fun onFailure(call: Call<PictureOfDay>, t: Throwable) {
+//                _response.value = "Failure: " + t.message
+//            }
+//        })
+//    }
 }
