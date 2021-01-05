@@ -11,6 +11,11 @@ import kotlinx.coroutines.launch
 
 class MainViewModel : ViewModel() {
 
+    private val _asteroidString = MutableLiveData<String>()
+
+    val asteroidString: LiveData<String>
+        get() = _asteroidString
+
     private val _apod = MutableLiveData<PictureOfDay>()
 
     val apod: LiveData<PictureOfDay>
@@ -18,25 +23,26 @@ class MainViewModel : ViewModel() {
 
     init {
         getNasaApod()
+        getNasaAsteroid()
     }
 
     private fun getNasaApod() {
         viewModelScope.launch {
             try {
-                _apod.value = NasaApi.retrofitService.getApod(BuildConfig.API_KEY)
+                _apod.value = NasaApi.apodService.getApod(BuildConfig.API_KEY)
             } catch (e: Exception) {
                 _apod.value = PictureOfDay("","Failure: ${e.message}","")
             }
         }
     }
-//        NasaApi.retrofitService.getApod(BuildConfig.API_KEY).enqueue(object : Callback<PictureOfDay> {
-//            override fun onResponse(call: Call<PictureOfDay>, response: Response<PictureOfDay>) {
-//                _response.value = "${response.body()?.title}"
-//            }
-//
-//            override fun onFailure(call: Call<PictureOfDay>, t: Throwable) {
-//                _response.value = "Failure: " + t.message
-//            }
-//        })
-//    }
+
+    private fun getNasaAsteroid() {
+        viewModelScope.launch {
+            try {
+                _asteroidString.value = NasaApi.asteroidService.getAstroids("2021-01-05", "2021-01-06", BuildConfig.API_KEY)
+            } catch (e: Exception) {
+                _asteroidString.value = "Failure: ${e.message}"
+            }
+        }
+    }
 }
