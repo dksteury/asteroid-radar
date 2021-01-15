@@ -10,6 +10,8 @@ import com.squareup.picasso.Picasso
 fun bindApod(imgView: ImageView, imgUrl: String?) {
         Picasso.with(imgView.context)
             .load(imgUrl)
+            .placeholder(R.drawable.placeholder_picture_of_day)
+            .error(R.drawable.placeholder_picture_of_day)
             .into(imgView)
 }
 

@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+        <variable
+            name="asteroid"
+            type="com.udacity.asteroidradar.Asteroid" />
+        <variable
+            name="clickListener"
+            type="com.udacity.asteroidradar.main.AsteroidListener" />
+    </data>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:background="@color/app_background"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:onClick="@{() -> clickListener.onClick(asteroid)}">
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/codename_item"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@{asteroid.codename}"
+                android:textColor="@color/default_text_color"
+                tools:text="@string/dummy_codename" />
+
+            <TextView
+                android:id="@+id/close_approach_date_item"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:text="@{asteroid.closeApproachDate}"
+                android:textColor="@color/default_text_color"
+                tools:text="@string/dummy_close_approach_date" />
+        </LinearLayout>
+
+        <ImageView
+            android:id="@+id/is_potentially_hazardous_item"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="16dp"
+            app:srcCompat="@drawable/ic_status_normal"
+            app:statusIcon="@{asteroid.potentiallyHazardous}" />
+
+    </LinearLayout>
+</layout>

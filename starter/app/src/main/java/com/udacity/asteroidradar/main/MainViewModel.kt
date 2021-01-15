@@ -1,25 +1,39 @@
 package com.udacity.asteroidradar.main
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
+import android.util.Log
+import android.widget.Toast
+import androidx.lifecycle.*
+import com.udacity.asteroidradar.Asteroid
 import com.udacity.asteroidradar.BuildConfig
+import com.udacity.asteroidradar.Constants.API_QUERY_DATE_FORMAT
 import com.udacity.asteroidradar.NasaApi
 import com.udacity.asteroidradar.PictureOfDay
+import com.udacity.asteroidradar.api.parseAsteroidsJsonResult
+import com.udacity.asteroidradar.api.parseStringToAsteroidList
 import kotlinx.coroutines.launch
+import org.json.JSONObject
+import java.text.SimpleDateFormat
+import java.util.*
 
 class MainViewModel : ViewModel() {
 
-    private val _asteroidString = MutableLiveData<String>()
+    val today : String  = Calendar.getInstance().time.toString(API_QUERY_DATE_FORMAT)
 
+    private val _apod = MutableLiveData<PictureOfDay>()
+    val apod: LiveData<PictureOfDay>
+        get() = _apod
+
+    private val _asteroidString = MutableLiveData<String>()
     val asteroidString: LiveData<String>
         get() = _asteroidString
 
-    private val _apod = MutableLiveData<PictureOfDay>()
+    val asteroids = Transformations.map(asteroidString) {
+        parseStringToAsteroidList(it)
+    }
 
-    val apod: LiveData<PictureOfDay>
-        get() = _apod
+    private val _navigateToDetail = MutableLiveData<Asteroid>()
+    val navigateToDetail: LiveData<Asteroid>
+        get() = _navigateToDetail
 
     init {
         getNasaApod()
@@ -31,7 +45,7 @@ class MainViewModel : ViewModel() {
             try {
                 _apod.value = NasaApi.apodService.getApod(BuildConfig.API_KEY)
             } catch (e: Exception) {
-                _apod.value = PictureOfDay("","Failure: ${e.message}","")
+                _apod.value = PictureOfDay("","Failure: ${e.message}","R.drawable.placeholder_picture_of_day")
             }
         }
     }
@@ -39,10 +53,24 @@ class MainViewModel : ViewModel() {
     private fun getNasaAsteroid() {
         viewModelScope.launch {
             try {
-                _asteroidString.value = NasaApi.asteroidService.getAstroids("2021-01-05", "2021-01-06", BuildConfig.API_KEY)
+                _asteroidString.value = NasaApi.asteroidService.getAstroids(today, today, BuildConfig.API_KEY)
             } catch (e: Exception) {
-                _asteroidString.value = "Failure: ${e.message}"
+                Log.i("MainViewModel", "Failure: ${e.message}")
+                Log.i("MainViewModel", "Calendar: $today")
             }
         }
+    }
+
+    fun onAsteroidClicked(asteroid: Asteroid) {
+        _navigateToDetail.value = asteroid
+    }
+
+    fun onAsteroidNavigated() {
+        _navigateToDetail.value = null
+    }
+
+    fun Date.toString(format: String, locale: Locale = Locale.getDefault()) : String {
+        val formatter = SimpleDateFormat(format, locale)
+        return formatter.format(this)
     }
 }
