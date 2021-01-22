@@ -2,9 +2,9 @@ package com.udacity.asteroidradar
 
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
+import com.udacity.asteroidradar.domain.PictureOfDay
+import kotlinx.coroutines.Deferred
 import okhttp3.ResponseBody
-import org.json.JSONObject
-import retrofit2.Call
 import retrofit2.Converter
 import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
@@ -25,10 +25,11 @@ interface NasaApodService {
 
 interface NasaAsteroidService {
     @GET("neo/rest/v1/feed") @StringAno
-    suspend fun getAstroids(
+    suspend fun getAstroidsNetwork(
         @Query("start_date") startDate : String,
         @Query("end_date") endDate : String,
         @Query("api_key") apiKey : String) : String
+//        @Query("api_key") apiKey : String) : Deferred<String>
 }
 
 object NasaApi {

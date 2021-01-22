@@ -4,7 +4,7 @@ import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.udacity.asteroidradar.Asteroid
+import com.udacity.asteroidradar.domain.Asteroid
 
 class DetailViewModel(selectedAsteroid: Asteroid) : ViewModel() {
     private val _asteroid = MutableLiveData<Asteroid>()

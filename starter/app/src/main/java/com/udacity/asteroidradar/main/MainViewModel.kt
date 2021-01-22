@@ -1,35 +1,41 @@
 package com.udacity.asteroidradar.main
 
+import android.app.Application
 import android.util.Log
-import android.widget.Toast
 import androidx.lifecycle.*
-import com.udacity.asteroidradar.Asteroid
+import com.udacity.asteroidradar.domain.Asteroid
 import com.udacity.asteroidradar.BuildConfig
 import com.udacity.asteroidradar.Constants.API_QUERY_DATE_FORMAT
 import com.udacity.asteroidradar.NasaApi
-import com.udacity.asteroidradar.PictureOfDay
-import com.udacity.asteroidradar.api.parseAsteroidsJsonResult
+import com.udacity.asteroidradar.domain.PictureOfDay
 import com.udacity.asteroidradar.api.parseStringToAsteroidList
+import com.udacity.asteroidradar.database.getDatabase
+import com.udacity.asteroidradar.repository.AsteroidsRepository
 import kotlinx.coroutines.launch
-import org.json.JSONObject
+import java.lang.IllegalArgumentException
 import java.text.SimpleDateFormat
 import java.util.*
 
-class MainViewModel : ViewModel() {
+class MainViewModel(application: Application) : AndroidViewModel(application) {
 
-    val today : String  = Calendar.getInstance().time.toString(API_QUERY_DATE_FORMAT)
+    private val database = getDatabase(application)
+    private val asteroidsRepository = AsteroidsRepository(database)
+
+//    val today : String  = Calendar.getInstance().time.toString(API_QUERY_DATE_FORMAT)
 
     private val _apod = MutableLiveData<PictureOfDay>()
     val apod: LiveData<PictureOfDay>
         get() = _apod
 
-    private val _asteroidString = MutableLiveData<String>()
-    val asteroidString: LiveData<String>
-        get() = _asteroidString
+//    private val _asteroidString = MutableLiveData<String>()
+//    val asteroidString: LiveData<String>
+//        get() = _asteroidString
 
-    val asteroids = Transformations.map(asteroidString) {
-        parseStringToAsteroidList(it)
-    }
+//    val asteroids = Transformations.map(asteroidString) {
+//        parseStringToAsteroidList(it)
+//    }
+
+    val asteroids = asteroidsRepository.asteroids
 
     private val _navigateToDetail = MutableLiveData<Asteroid>()
     val navigateToDetail: LiveData<Asteroid>
@@ -37,7 +43,14 @@ class MainViewModel : ViewModel() {
 
     init {
         getNasaApod()
-        getNasaAsteroid()
+//        getNasaAsteroid()
+        viewModelScope.launch {
+            try {
+                asteroidsRepository.refreshAsteroids()
+            } catch (e: Exception) {
+                Log.i("MainViewModel", "Failure: ${e.message}")
+            }
+        }
     }
 
     private fun getNasaApod() {
@@ -50,16 +63,16 @@ class MainViewModel : ViewModel() {
         }
     }
 
-    private fun getNasaAsteroid() {
-        viewModelScope.launch {
-            try {
-                _asteroidString.value = NasaApi.asteroidService.getAstroids(today, today, BuildConfig.API_KEY)
-            } catch (e: Exception) {
-                Log.i("MainViewModel", "Failure: ${e.message}")
-                Log.i("MainViewModel", "Calendar: $today")
-            }
-        }
-    }
+//    private fun getNasaAsteroid() {
+//        viewModelScope.launch {
+//            try {
+//                _asteroidString.value = NasaApi.asteroidService.getAstroidsNetwork(today, today, BuildConfig.API_KEY)
+//            } catch (e: Exception) {
+//                Log.i("MainViewModel", "Failure: ${e.message}")
+//                Log.i("MainViewModel", "Calendar: $today")
+//            }
+//        }
+//    }
 
     fun onAsteroidClicked(asteroid: Asteroid) {
         _navigateToDetail.value = asteroid
@@ -69,8 +82,18 @@ class MainViewModel : ViewModel() {
         _navigateToDetail.value = null
     }
 
-    fun Date.toString(format: String, locale: Locale = Locale.getDefault()) : String {
-        val formatter = SimpleDateFormat(format, locale)
-        return formatter.format(this)
+//    fun Date.toString(format: String, locale: Locale = Locale.getDefault()) : String {
+//        val formatter = SimpleDateFormat(format, locale)
+//        return formatter.format(this)
+//    }
+
+    class Factory(val app: Application) : ViewModelProvider.Factory {
+        override fun <T : ViewModel?> create(modelClass: Class<T>): T {
+            if (modelClass.isAssignableFrom(MainViewModel::class.java)) {
+                @Suppress("UNCHECKED_CAST")
+                return MainViewModel(app) as T
+            }
+            throw IllegalArgumentException("Unable to construct viewmodel")
+        }
     }
 }
