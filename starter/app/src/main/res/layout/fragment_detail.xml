@@ -22,6 +22,7 @@
             android:layout_height="wrap_content"
             android:adjustViewBounds="true"
             app:asteroidStatusImage="@{viewModel.asteroid.potentiallyHazardous}"
+            android:contentDescription="@{viewModel.hazardousText}"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
@@ -94,6 +95,7 @@
                         android:id="@+id/help_button"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:contentDescription="@string/description_help_button"
                         android:padding="16dp"
                         app:srcCompat="@drawable/ic_help_circle" />
 

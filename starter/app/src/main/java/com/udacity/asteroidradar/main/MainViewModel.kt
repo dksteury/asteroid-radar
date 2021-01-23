@@ -16,34 +16,33 @@ import java.lang.IllegalArgumentException
 import java.text.SimpleDateFormat
 import java.util.*
 
+enum class AsteroidFilter {TODAY, WEEK, ALL}
+
 class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     private val database = getDatabase(application)
     private val asteroidsRepository = AsteroidsRepository(database)
 
-//    val today : String  = Calendar.getInstance().time.toString(API_QUERY_DATE_FORMAT)
-
     private val _apod = MutableLiveData<PictureOfDay>()
     val apod: LiveData<PictureOfDay>
         get() = _apod
 
-//    private val _asteroidString = MutableLiveData<String>()
-//    val asteroidString: LiveData<String>
-//        get() = _asteroidString
+    private val _filter = MutableLiveData<AsteroidFilter>()
 
-//    val asteroids = Transformations.map(asteroidString) {
-//        parseStringToAsteroidList(it)
-//    }
-
-    val asteroids = asteroidsRepository.asteroids
+    val asteroids = Transformations.switchMap(_filter) {
+        when (it) {
+            AsteroidFilter.TODAY -> asteroidsRepository.asteroidsToday
+            AsteroidFilter.WEEK -> asteroidsRepository.asteroidsWeek
+            else -> asteroidsRepository.asteroidsAll
+        }
+    }
 
     private val _navigateToDetail = MutableLiveData<Asteroid>()
     val navigateToDetail: LiveData<Asteroid>
         get() = _navigateToDetail
 
     init {
-        getNasaApod()
-//        getNasaAsteroid()
+        _filter.value = AsteroidFilter.WEEK
         viewModelScope.launch {
             try {
                 asteroidsRepository.refreshAsteroids()
@@ -51,6 +50,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                 Log.i("MainViewModel", "Failure: ${e.message}")
             }
         }
+        getNasaApod()
     }
 
     private fun getNasaApod() {
@@ -63,17 +63,6 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
-//    private fun getNasaAsteroid() {
-//        viewModelScope.launch {
-//            try {
-//                _asteroidString.value = NasaApi.asteroidService.getAstroidsNetwork(today, today, BuildConfig.API_KEY)
-//            } catch (e: Exception) {
-//                Log.i("MainViewModel", "Failure: ${e.message}")
-//                Log.i("MainViewModel", "Calendar: $today")
-//            }
-//        }
-//    }
-
     fun onAsteroidClicked(asteroid: Asteroid) {
         _navigateToDetail.value = asteroid
     }
@@ -82,10 +71,9 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         _navigateToDetail.value = null
     }
 
-//    fun Date.toString(format: String, locale: Locale = Locale.getDefault()) : String {
-//        val formatter = SimpleDateFormat(format, locale)
-//        return formatter.format(this)
-//    }
+    fun updateFilter(filter: AsteroidFilter) {
+        _filter.value = filter
+    }
 
     class Factory(val app: Application) : ViewModelProvider.Factory {
         override fun <T : ViewModel?> create(modelClass: Class<T>): T {
