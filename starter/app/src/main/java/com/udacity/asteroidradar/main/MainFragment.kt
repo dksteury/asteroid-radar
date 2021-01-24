@@ -4,10 +4,12 @@ import android.os.Bundle
 import android.util.Log
 import android.view.*
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
+import com.google.android.material.snackbar.Snackbar
 import com.udacity.asteroidradar.R
 import com.udacity.asteroidradar.databinding.FragmentMainBinding
 
@@ -47,10 +49,33 @@ class MainFragment : Fragment() {
             }
         })
 
+        viewModel.networkError.observe(viewLifecycleOwner, Observer {
+            if (it != null) {
+                Snackbar.make(
+                        requireActivity().findViewById(android.R.id.content),
+                        it,
+                        Snackbar.LENGTH_INDEFINITE
+                        )
+                        .setAction(R.string.retry) {
+                            viewModel.retry()
+                        }
+                        .show()
+            }
+        })
+
         setHasOptionsMenu(true)
 
         return binding.root
     }
+
+//    private fun displayNetworkErrorDialog() {
+//        val builder = AlertDialog.Builder(requireActivity())
+//                .setMessage(getString(R.string.network_error_explanation))
+//                .setPositiveButton(R.string.retry, viewModel.retry())
+//                .setMessage(getString(R.string.astronomica_unit_explanation))
+//                .setPositiveButton(android.R.string.ok, null)
+//        builder.create().show()
+//    }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         inflater.inflate(R.menu.main_overflow_menu, menu)

@@ -41,7 +41,17 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     val navigateToDetail: LiveData<Asteroid>
         get() = _navigateToDetail
 
+    private val _networkError = MutableLiveData<String>()
+    val networkError: LiveData<String>
+        get() = _networkError
+
+    private val _networkOff = MutableLiveData<Boolean>()
+    val networkOff: LiveData<Boolean>
+        get() = _networkOff
+
     init {
+        _networkError.value = null
+        _networkOff.value = false
         _filter.value = AsteroidFilter.WEEK
         viewModelScope.launch {
             try {
@@ -58,7 +68,10 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             try {
                 _apod.value = NasaApi.apodService.getApod(BuildConfig.API_KEY)
             } catch (e: Exception) {
-                _apod.value = PictureOfDay("","Failure: ${e.message}","R.drawable.placeholder_picture_of_day")
+//                _apod.value = PictureOfDay("","Failure: ${e.message}","R.drawable.placeholder_picture_of_day")
+                _apod.value = PictureOfDay("","Image of the Day","R.drawable.placeholder_picture_of_day")
+                _networkError.value = "Failure: ${e.message}"
+                _networkOff.value = true
             }
         }
     }
@@ -73,6 +86,12 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     fun updateFilter(filter: AsteroidFilter) {
         _filter.value = filter
+    }
+
+    fun retry() {
+        _networkError.value = null
+        _networkOff.value = false
+        getNasaApod()
     }
 
     class Factory(val app: Application) : ViewModelProvider.Factory {

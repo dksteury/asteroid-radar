@@ -30,9 +30,6 @@ class DetailFragment : Fragment() {
             displayAstronomicalUnitExplanationDialog()
         }
 
-//        viewModel.asteroid.observe(viewLifecycleOwner, Observer {
-//            viewModel.changeHazardous(it.isPotentiallyHazardous)
-//        })
         return binding.root
     }
 

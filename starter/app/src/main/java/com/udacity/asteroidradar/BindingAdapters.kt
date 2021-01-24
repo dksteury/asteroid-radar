@@ -1,6 +1,8 @@
 package com.udacity.asteroidradar
 
+import android.view.View
 import android.widget.ImageView
+import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.core.net.toUri
 import androidx.databinding.BindingAdapter
@@ -13,6 +15,24 @@ fun bindApod(imgView: ImageView, imgUrl: String?) {
             .placeholder(R.drawable.placeholder_picture_of_day)
             .error(R.drawable.placeholder_picture_of_day)
             .into(imgView)
+}
+
+@BindingAdapter("asteroidStatusContent")
+fun bindAsteroidStatusContent(imageView: ImageView, isHazardous: Boolean) {
+    if (isHazardous) {
+        imageView.contentDescription = "potentially hazardous"
+    } else {
+        imageView.contentDescription = "not hazardous"
+    }
+}
+
+@BindingAdapter("progressBarVisibility")
+fun bindProgressBar(progressBar: ProgressBar, networkError: String?) {
+    if (networkError == null) {
+        progressBar.visibility = View.GONE
+    } else {
+        progressBar.visibility = View.VISIBLE
+    }
 }
 
 @BindingAdapter("statusIcon")

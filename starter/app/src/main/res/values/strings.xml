@@ -25,4 +25,8 @@
     <string name="description_help_button">help</string>
     <string name="description_potentially_hazardous">potentially hazardous</string>
     <string name="description_not_hazardous">not hazardous</string>
+    <string name="network_error_explanation">Error: Network Unavailable!</string>
+    <string name="retry">Retry</string>
+    <string name="hazadous_icon">Hazadous icon</string>
+    <string name="hazardous">Hazardous</string>
 </resources>

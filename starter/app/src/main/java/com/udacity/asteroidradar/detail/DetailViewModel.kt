@@ -14,17 +14,8 @@ class DetailViewModel(selectedAsteroid: Asteroid) : ViewModel() {
     val asteroid: LiveData<Asteroid>
         get() = _asteroid
 
-    private val _hazardousText = MutableLiveData<String>()
-    val hazardousText = Transformations.map(asteroid) {
-        when (it.isPotentiallyHazardous) {
-            true -> "potentially hazardous"
-            else -> "not hazardous"
-        }
-    }
-
     init {
         _asteroid.value = selectedAsteroid
-        _hazardousText.value = "hazardous"
         Log.i("DetailViewModel", "Init was run ${asteroid.value}")
     }
 }
